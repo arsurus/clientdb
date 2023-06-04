@@ -34,11 +34,13 @@ def add_client(conn, first_name, last_name, email, phone=None):
         SELECT client_id FROM clients WHERE email=%s;
         """, (email,))
     cl_id = cur.fetchone()[0]
-    cur.execute("""
-        INSERT INTO clients_phones (client_id, phone)
-        VALUES (%s, %s); """, (cl_id, phone))
-    conn.commit()
-    cur.close()
+    if phone != None:
+        cur.execute("""
+            INSERT INTO clients_phones (client_id, phone)
+            VALUES (%s, %s); """, (cl_id, phone))
+        conn.commit()
+    else:
+        cur.close()
 
 # Добавление тел.номера
 def add_phone(conn, client_id, phone):
@@ -71,8 +73,8 @@ def change_client(conn, client_id, first_name=None, last_name=None, email=None):
         cur.close()
 
 #create_db(conn)
-#add_client(conn, 'Lora999', 'Smirnova999', 'lora999@mail.com', '80002400156')
-#add_phone(conn, 1, '00123421244')
-change_client(conn, 1, 'SLAVA', 'SLAVIN', 'SLAVA@SLAVA.COM')
+#add_client(conn, 'Mika', 'Figova', 'mika@mail.com')
+add_phone(conn, 12, '1111111111')
+#change_client(conn, 1, 'SLAVA', 'SLAVIN', 'SLAVA@SLAVA.COM')
 
 conn.close()

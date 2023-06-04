@@ -93,11 +93,23 @@ def delete_client(conn, client_id):
     conn.commit()
     cur.close()
 
+# Функция поиска клиента по его данным
+def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM clients as c
+        LEFT JOIN clients_phones as cp on c.client_id = cp.client_id 
+        WHERE first_name=%s OR last_name=%s OR email=%s OR phone=%s
+        """, (first_name, last_name, email, phone))
+    print(cur.fetchall())
+    cur.close()
+
 #create_db(conn)
-#add_client(conn, 'test', 'testov', 'test@mail.com')
+#add_client(conn, 'Nika', 'Ivanova', 'test4@mail.com', '312244')
 #add_phone(conn, 13, '1111120111')
 #change_client(conn, 12, 'Figa')
 #delete_phone(conn, 10)
-delete_client (conn, 13)
+#delete_client (conn, 13)
+find_client(conn, '','Ivanova', '', '')
 
 conn.close()

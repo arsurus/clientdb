@@ -1,7 +1,5 @@
 import psycopg2
 
-conn = psycopg2.connect(dbname='clientdb', user='postgres', password='postgres')
-
 # Создание таблиц
 def create_db(conn):
     cur = conn.cursor()
@@ -104,12 +102,16 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
     print(cur.fetchall())
     cur.close()
 
-#create_db(conn)
-#add_client(conn, 'Nika', 'Ivanova', 'test4@mail.com', '312244')
-#add_phone(conn, 13, '1111120111')
-#change_client(conn, 12, 'Figa')
-#delete_phone(conn, 10)
-#delete_client (conn, 13)
-find_client(conn, '','Ivanova', '', '')
 
-conn.close()
+# Вызов функций
+with psycopg2.connect(database="clientdb", user="postgres", password="postgres") as conn:
+
+    create_db(conn)
+    add_client(conn, 'Nika', 'Ivanova', 'test16968@mail.com', '173129244')
+    add_phone(conn, 3, '12345')
+    change_client(conn, 12, 'Figa')
+    delete_phone(conn, 3, '12345')
+    delete_client (conn, 2)
+    find_client(conn, '','Ivanova', '', '')
+
+

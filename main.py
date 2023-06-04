@@ -72,9 +72,20 @@ def change_client(conn, client_id, first_name=None, last_name=None, email=None):
     else:
         cur.close()
 
+# Функция удаления  телефона для существующего клиента
+def delete_phone(conn, client_id, phone):
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM clients_phones WHERE client_id=%s AND phone=%s;
+        """, (client_id, phone))
+    conn.commit()
+    cur.close()
+
+
 #create_db(conn)
 #add_client(conn, 'Mika', 'Figova', 'mika@mail.com')
-add_phone(conn, 12, '1111111111')
-#change_client(conn, 1, 'SLAVA', 'SLAVIN', 'SLAVA@SLAVA.COM')
+#add_phone(conn, 12, '1111111111')
+#change_client(conn, 12, 'Figa')
+delete_phone(conn, 10)
 
 conn.close()

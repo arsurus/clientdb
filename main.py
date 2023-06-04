@@ -106,12 +106,16 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
 # Вызов функций
 with psycopg2.connect(database="clientdb", user="postgres", password="postgres") as conn:
 
-    create_db(conn)
-    add_client(conn, 'Nika', 'Ivanova', 'test16968@mail.com', '173129244')
-    add_phone(conn, 3, '12345')
-    change_client(conn, 12, 'Figa')
-    delete_phone(conn, 3, '12345')
-    delete_client (conn, 2)
-    find_client(conn, '','Ivanova', '', '')
+    # create_db(conn)
+    # add_client(conn, 'Nika', 'Ivanova', 'nivanova@mail.com', '12345678')
+    # add_client(conn, 'Vasya', 'Petrov', 'vasya@mail.com', '11223344')
+    # add_client(conn, 'Lev', 'Tolstoy', 'leva@mail.com')
+    # add_client(conn, 'Petr', 'Velikiy', 'piter@mail.com')
+    # add_phone(conn, 1, '87654321')
+    # add_phone(conn, 3, '00000000')
+    #change_client(conn, 4, None, 'Perviy')
+    #delete_phone(conn, 2, '11223344')
+    #delete_client (conn, 3)
+    #find_client(conn, None, None, 'nivanova@mail.com' )
 
 

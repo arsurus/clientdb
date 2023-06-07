@@ -24,32 +24,50 @@ def create_db(conn):
 # Добавление клиента
 def add_client(conn, first_name, last_name, email, phone=None):
     cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO clients (first_name, last_name, email)
-        VALUES (%s, %s, %s); """, (first_name, last_name, email))
-    conn.commit()
-    cur.execute("""
-        SELECT client_id FROM clients WHERE email=%s;
-        """, (email,))
-    cl_id = cur.fetchone()[0]
-    if phone != None:
-        cur.execute("""
-            INSERT INTO clients_phones (client_id, phone)
-            VALUES (%s, %s); """, (cl_id, phone))
-        conn.commit()
+    if find_client(conn, email=email) == 'Клиент найден':
+        result = "Клиент с указанным email уже существует"
+        return print(result)
     else:
+        cur.execute("""
+            INSERT INTO clients (first_name, last_name, email)
+            VALUES (%s, %s, %s) RETURNING client_id; """, (first_name, last_name, email))
+        if phone != None:
+            cl_id = cur.fetchone()
+            result = add_phone(conn, cl_id, phone)
+            if result != 'Телефон добавлен':
+                conn.rollback()
+                result = 'Добавить данного клиента невозможно'
+                return print (result)
+            else:
+                conn.commit()
+                result = 'Клиент добавлен'
+                print(result)
+                return result
+        else:
+            result = 'Клиент добавлен'
+            print(result)
+            return result
         cur.close()
+
 
 # Добавление тел.номера
 def add_phone(conn, client_id, phone):
     cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO clients_phones (client_id, phone)
-        VALUES (%s, %s); """, (client_id, phone))
-    conn.commit()
-    cur.close()
+    if find_client(conn, None, None, None, phone=phone) == 'Клиент не найден':
+        cur.execute("""
+            INSERT INTO clients_phones (client_id, phone)
+            VALUES (%s, %s); """, (client_id, phone))
+        conn.commit()
+        cur.close()
+        result = 'Телефон добавлен'
+        print(result)
+        return result
+    else:
+        result = 'Данный тел. номер уже существует в базе'
+        print(result)
+        return result
 
-# Изменение данных о клиенте
+    # Изменение данных о клиенте
 def change_client(conn, client_id, first_name=None, last_name=None, email=None):
     cur = conn.cursor()
     if first_name != None:
@@ -99,23 +117,34 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
         LEFT JOIN clients_phones as cp on c.client_id = cp.client_id 
         WHERE first_name=%s OR last_name=%s OR email=%s OR phone=%s
         """, (first_name, last_name, email, phone))
-    print(cur.fetchall())
+    a = cur.fetchall()
+    print(a)
     cur.close()
+    if a == []:
+        result = "Клиент не найден"
+        print(result)
+        return result
+    else:
+        cur.close()
+        result = "Клиент найден"
+        print(result)
+        return result
+
 
 
 # Вызов функций
 with psycopg2.connect(database="clientdb", user="postgres", password="postgres") as conn:
 
     # create_db(conn)
-    # add_client(conn, 'Nika', 'Ivanova', 'nivanova@mail.com', '12345678')
+    add_client(conn, '3ASD', '23SD', '2AS3D@mail.com', '9000766354')
     # add_client(conn, 'Vasya', 'Petrov', 'vasya@mail.com', '11223344')
     # add_client(conn, 'Lev', 'Tolstoy', 'leva@mail.com')
     # add_client(conn, 'Petr', 'Velikiy', 'piter@mail.com')
-    # add_phone(conn, 1, '87654321')
+    ##add_phone(conn, 1, '876543321')
     # add_phone(conn, 3, '00000000')
-    change_client(conn, 4, None, None,'petr@mail.ru')
+    ##change_client(conn, 4, None, None,'petr@mail.ru')
     #delete_phone(conn, 2, '11223344')
     #delete_client (conn, 3)
-    #find_client(conn, None, None, 'nivanova@mail.com' )
+    #find_client(conn, None , None, 'Nika@mail.com')
 
 

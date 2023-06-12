@@ -20,7 +20,6 @@ def create_db(conn):
             """)
         conn.commit()
 
-
 # Добавление клиента
 def add_client(conn, first_name, last_name, email, phone=None):
     with conn.cursor() as cur:
@@ -40,8 +39,6 @@ def add_client(conn, first_name, last_name, email, phone=None):
             conn.commit()
             result = 'Клиент добавлен'
             return result
-
-
 
 # Добавление тел.номера
 def add_phone(conn, client_id, phone):
@@ -91,23 +88,44 @@ def change_client(conn, client_id, first_name=None, last_name=None, email=None):
                 return "Изменения приняты"
         return "Клиент ID не найден"
 
-
 # Функция удаления  телефона для существующего клиента
 def delete_phone(conn, client_id, phone):
     with conn.cursor() as cur:
-        cur.execute("""
-            DELETE FROM clients_phones WHERE client_id=%s AND phone=%s;
-            """, (client_id, phone))
-        conn.commit()
-
+        cur.execute(""" 
+             SELECT client_id from clients WHERE client_id=%s;
+             """, (client_id,))
+        fnd = cur.fetchone()
+        print(fnd)
+        if fnd:
+            cur.execute(""" 
+                SELECT client_id from clients_phones WHERE phone=%s;
+                """, (phone,))
+            fnd2 = cur.fetchone()
+            print(fnd2)
+            if (fnd2 == fnd) and (find_client(conn, None, None, None, phone=phone) == 'Клиент найден'):
+                cur.execute(""" 
+                    DELETE FROM clients_phones WHERE client_id=%s AND phone=%s;
+                    """, (client_id, phone))
+                conn.commit()
+                return "Тел номер удален"
+            return "Телефонный номер не найден или имеется несоответствие"
+        return "Клиент ID не найден"
 
 # Функция удаления существующего клиента
 def delete_client(conn, client_id):
     with conn.cursor() as cur:
-        cur.execute("""
-            DELETE FROM clients WHERE client_id=%s;
-            """, (client_id,))
-        conn.commit()
+        cur.execute(""" 
+              SELECT client_id from clients WHERE client_id=%s;
+              """, (client_id,))
+        fnd = cur.fetchone()
+        print(fnd)
+        if fnd:
+            cur.execute("""
+                DELETE FROM clients WHERE client_id=%s;
+                """, (client_id,))
+            conn.commit()
+            return "Клиент удален"
+        return "Кдиент ID не найден"
 
 # Функция поиска клиента по его данным
 def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
@@ -129,16 +147,17 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
 # Вызов функций
 with psycopg2.connect(database="clientdb", user="postgres", password="postgres") as conn:
 
-    # create_db(conn)
-    #add_client(conn, '3eASD', '23wSD', '2AS3Dq@mail.com', '900076w6354')
+   #create_db(conn)
+   # print(add_client(conn, '32eASD', None, 'asbce@abc.ru', '9s000e2276w6354'))
+
     #print (add_client(conn, '12822Vasya', '1222Petrov', '122vasy2a@mail.com', ))
-    # add_client(conn, 'Lev', 'Tolstoy', 'leva@mail.com')
+     #add_client(conn, 'Lev', 'Tolstoy', 'leva@mail.com')
     # add_client(conn, 'Petr', 'Velikiy', 'piter@mail.com')
-    #add_phone(conn, 2, '8766543321')
-    #print (add_phone(conn, 7, '000124340000'))
-    print (change_client(conn, 3, None, None,'p8e1tr@mail.ru'))
-    #delete_phone(conn, 2, '11223344')
-    #delete_client (conn, 1)
-    #find_client(conn, None , None, 'leva@mail.com')
+    #print(add_phone(conn, 32, '87665343321'))
+    #print (add_phone(conn, 2, '000124340000'))
+    #print (change_client(conn, 2, None, None,'p8e1tr@mail.ru'))
+    #print(delete_phone(conn, 500, '90002276w6354'))
+    print(delete_client (conn, 99))
+    #print (find_client(conn, 'Lev', None,))
 
 

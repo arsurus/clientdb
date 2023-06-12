@@ -66,22 +66,30 @@ def add_phone(conn, client_id, phone):
 # Изменение данных о клиенте
 def change_client(conn, client_id, first_name=None, last_name=None, email=None):
     with conn.cursor() as cur:
-        if first_name != None:
-            cur.execute("""
-                UPDATE clients SET first_name=%s WHERE client_id=%s;
-                """, (first_name, client_id))
-            conn.commit()
-        if last_name != None:
-            cur.execute("""
-                UPDATE clients SET last_name=%s WHERE client_id=%s;
-                """, (last_name, client_id))
-            conn.commit()
-        if email != None:
-            cur.execute("""
-                UPDATE clients SET email=%s WHERE client_id=%s;
-                """, (email, client_id))
-            conn.commit()
-
+        cur.execute(""" 
+            SELECT client_id from clients WHERE client_id=%s;
+            """, (client_id,))
+        fnd = cur.fetchone()
+        if fnd:
+            if first_name != None:
+                cur.execute("""
+                    UPDATE clients SET first_name=%s WHERE client_id=%s;
+                    """, (first_name, client_id))
+                conn.commit()
+                return "Изменения приняты"
+            if last_name != None:
+                cur.execute("""
+                    UPDATE clients SET last_name=%s WHERE client_id=%s;
+                    """, (last_name, client_id))
+                conn.commit()
+                return "Изменения приняты"
+            if email != None:
+                cur.execute("""
+                    UPDATE clients SET email=%s WHERE client_id=%s;
+                    """, (email, client_id))
+                conn.commit()
+                return "Изменения приняты"
+        return "Клиент ID не найден"
 
 
 # Функция удаления  телефона для существующего клиента
@@ -123,12 +131,12 @@ with psycopg2.connect(database="clientdb", user="postgres", password="postgres")
 
     # create_db(conn)
     #add_client(conn, '3eASD', '23wSD', '2AS3Dq@mail.com', '900076w6354')
-    print (add_client(conn, '12822Vasya', '1222Petrov', '122vasy2a@mail.com', ))
+    #print (add_client(conn, '12822Vasya', '1222Petrov', '122vasy2a@mail.com', ))
     # add_client(conn, 'Lev', 'Tolstoy', 'leva@mail.com')
     # add_client(conn, 'Petr', 'Velikiy', 'piter@mail.com')
     #add_phone(conn, 2, '8766543321')
     #print (add_phone(conn, 7, '000124340000'))
-    #change_client(conn, 4, None, None,'petr@mail.ru')
+    print (change_client(conn, 3, None, None,'p8e1tr@mail.ru'))
     #delete_phone(conn, 2, '11223344')
     #delete_client (conn, 1)
     #find_client(conn, None , None, 'leva@mail.com')
